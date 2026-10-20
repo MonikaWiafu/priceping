@@ -6,79 +6,170 @@
 <title>PricePing</title>
 <style>
 :root{
-  --bg:#F6F7F9;--card:#FFFFFF;--ink:#14181C;--muted:#5E6872;--line:#E3E7EC;
-  --brand:#0E7C66;--brand-ink:#FFFFFF;--brand-soft:#E3F3EF;
-  --down:#0E8A4F;--up:#C2410C;--warn:#A15C07;--warn-soft:#FEF3C7;
-  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.07);--r:14px;
+  --bg:#EEF1F4;--card:#FFFFFF;--ink:#0F1111;--muted:#565959;--line:#DDE1E6;
+  --head:#131A26;--head2:#1F2A3B;--head-ink:#FFFFFF;
+  --accent:#FFB020;--accent-ink:#111;--accent-press:#F0A10E;
+  --link:#0A6F8F;--brand:#0E7C66;--brand-soft:#E3F3EF;
+  --deal:#CC0C39;--down:#0E8A4F;--up:#C2410C;--warn:#A15C07;--warn-soft:#FEF3C7;--star:#F5A623;
+  --shadow:0 1px 2px rgba(16,24,40,.06);--r:12px;
 }
 html[data-theme=dark]{
-  --bg:#111416;--card:#1B1F23;--ink:#ECEFF2;--muted:#9AA4AE;--line:#2A3036;
-  --brand:#3CC3A2;--brand-ink:#06231C;--brand-soft:#16302A;
-  --down:#4ADE80;--up:#FB923C;--warn:#FBBF24;--warn-soft:#3A2E10;--shadow:none;
+  --bg:#0E1116;--card:#181D24;--ink:#E8ECF1;--muted:#9AA4AE;--line:#2A313A;
+  --head:#0A0E14;--head2:#151C27;
+  --link:#5CC8E6;--brand:#3CC3A2;--brand-soft:#16302A;
+  --deal:#FF5C7A;--down:#4ADE80;--up:#FB923C;--warn:#FBBF24;--warn-soft:#3A2E10;--shadow:none;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
-button:disabled{opacity:.6}
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px;padding:12px 12px 10px 16px;background:var(--bg)}
+button:disabled{opacity:.55}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn svg.i,.chip svg.i{width:18px;height:18px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- search header ---------- */
+.shead{position:sticky;top:0;z-index:5;background:var(--head);color:var(--head-ink);padding:10px 12px 0}
+.brandrow{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:-.01em;margin:0 2px 8px}
+.brandrow .logo{width:26px;height:26px;border-radius:7px;background:var(--accent);color:#111;display:grid;place-items:center}
+.brandrow .logo svg.i{width:16px;height:16px;stroke-width:2.4}
+.brandrow small{font-weight:500;opacity:.65;margin-left:auto;font-size:12px}
+.sbar{display:flex;border-radius:10px;overflow:hidden;background:#fff;height:46px}
+.sbar input{flex:1;min-width:0;border:0;outline:none;padding:0 12px;font:inherit;font-size:16px;color:#111;background:#fff}
+.sbar .clear{width:40px;color:#666;display:grid;place-items:center}
+.sbar .go{width:54px;background:var(--accent);color:#111;display:grid;place-items:center}
+.sbar .go:active{background:var(--accent-press)}
+.storebar{display:flex;gap:6px;overflow-x:auto;padding:10px 0 10px;scrollbar-width:none}
+.storebar::-webkit-scrollbar{display:none}
+.schip{flex:none;display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;background:var(--head2);color:#DDE3EA;font-size:13px;border:1px solid transparent}
+.schip.on{border-color:var(--accent);color:#fff}
+.schip.off{opacity:.45}
+.schip b{font-weight:700;color:var(--accent)}
+.schip .dot{width:7px;height:7px;border-radius:50%;background:#7B8794}
+.schip svg.i{width:14px;height:14px}
+
+.toolbar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:var(--shead-h,128px);z-index:4}
+.toolbar .count{flex:1;font-size:13px;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toolbar .count b{color:var(--ink)}
+.selwrap{position:relative}
+.selwrap select{appearance:none;-webkit-appearance:none;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:13px;padding:0 28px 0 10px;outline:none}
+.selwrap::after{content:"";position:absolute;right:11px;top:13px;width:6px;height:6px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);pointer-events:none}
+.fbtn{height:34px;padding:0 10px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;gap:5px;font-size:13px;background:var(--bg)}
+.fbtn svg.i{width:16px;height:16px}
+.fbtn .n{background:var(--accent);color:#111;border-radius:999px;font-size:11px;font-weight:700;padding:0 6px}
+
+/* ---------- result cards ---------- */
+.results{padding:8px 8px 96px}
+.rcard{display:flex;gap:12px;background:var(--card);border-radius:var(--r);padding:12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid var(--line);position:relative;width:100%;text-align:left}
+.rcard:active{transform:scale(.995)}
+.rimg{width:112px;height:128px;flex:none;border-radius:8px;background:#fff;display:grid;place-items:center;overflow:hidden}
+.rimg img{max-width:100%;max-height:100%;object-fit:contain}
+.rimg.ph{color:#9AA4AE}
+.rbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.rtitle{font-size:14px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.stars{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--link)}
+.st{position:relative;display:inline-block;font-size:13px;letter-spacing:1px;line-height:1;color:#D5D9D9}
+.st i{position:absolute;left:0;top:0;overflow:hidden;white-space:nowrap;color:var(--star);font-style:normal}
+.price{display:flex;align-items:flex-start;gap:1px;font-weight:500;color:var(--ink);margin-top:2px;font-variant-numeric:tabular-nums}
+.price sup{font-size:12px;line-height:1;margin-top:4px}
+.price .w{font-size:26px;line-height:1}
+.priceline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.off{background:var(--deal);color:#fff;font-size:12px;font-weight:700;padding:2px 6px;border-radius:5px}
+.was{font-size:12px;color:var(--muted)}
+.was s{font-variant-numeric:tabular-nums}
+.meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px;padding-right:44px}
+.store{font-size:11px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:5px;color:#fff}
+.s-amazon{background:#232F3E}.s-walmart{background:#0071DC}.s-bestbuy{background:#0046BE}.s-target{background:#CC0000}.s-ebay{background:#86B817}.s-newegg{background:#E67E22}.s-other{background:#6B7280}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.tag.cheap{color:var(--down);border-color:var(--down);font-weight:700}
+.trk{position:absolute;right:8px;bottom:8px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--bg);color:var(--ink)}
+.trk.on{background:var(--brand);color:#fff}
+.trk svg.i{width:19px;height:19px}
+
+.skel{height:150px;border-radius:var(--r);margin-bottom:8px;background:linear-gradient(90deg,var(--card) 0%,var(--line) 50%,var(--card) 100%);background-size:200% 100%;animation:sh 1.2s infinite linear}
+@keyframes sh{to{background-position:-200% 0}}
+.note{margin:6px 4px 10px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--ink);font-size:13px}
+
+/* ---------- generic ---------- */
+header.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px;padding:10px 10px 10px 16px;background:var(--bg)}
 h1{font-size:22px;margin:0;flex:1;letter-spacing:-.01em;min-width:0}
 h1.sm{font-size:17px;font-weight:600}
 .icon-btn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
 .icon-btn:active{background:var(--line)}
-svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.btn svg.i{width:18px;height:18px}
-main{padding:0 16px 110px}
+main{padding:0 14px 96px}
 .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--line)}
 .pad{padding:14px}
-.item{display:flex;gap:12px;padding:12px;margin-bottom:10px;align-items:center;width:100%;text-align:left}
-.item:active{transform:scale(.99)}
-.thumb{width:64px;height:64px;border-radius:10px;background:#fff;object-fit:contain;flex:none;border:1px solid var(--line)}
-.thumb.ph{display:grid;place-items:center;color:var(--brand);background:var(--brand-soft);border:0}
-.grow{flex:1;min-width:0}
-.name{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.btn{height:46px;padding:0 16px;border-radius:12px;font-weight:700;background:var(--accent);color:var(--accent-ink);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{background:var(--accent-press)}
+.btn.brand{background:var(--brand);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600}
+.btn.danger{background:transparent;color:var(--up);border:1px solid var(--line);font-weight:600}
+.btn.danger-fill{background:var(--up);color:#fff}
+.btn.sm{height:34px;padding:0 12px;font-size:13px;border-radius:10px}
+.wide{width:100%;margin-top:12px}
 .sub{color:var(--muted);font-size:13px}
 .clamp1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.price{font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.end{justify-content:flex-end}
+.grow{flex:1;min-width:0}
+.center{text-align:center}
+.section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:20px 4px 8px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand);font-weight:600;white-space:nowrap}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:none}
+.row input{flex:1;width:auto;min-width:0}
+label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:600}
+.toast{position:fixed;left:14px;right:14px;bottom:80px;background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:12px;z-index:40;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;font-size:14px}
+.toast.show{opacity:1;transform:none}
+
+/* ---------- bottom nav ---------- */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;height:62px;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:10}
+nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted);position:relative}
+nav.tabs button.on{color:var(--ink);font-weight:700}
+nav.tabs button.on svg.i{color:var(--accent)}
+nav.tabs .cnt{position:absolute;top:7px;left:calc(50% + 6px);background:var(--deal);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:0 5px;min-width:16px;text-align:center}
+
+/* ---------- product page ---------- */
+.pimg{background:#fff;height:280px;display:grid;place-items:center;border-radius:var(--r);overflow:hidden;padding:12px}
+.pimg img{max-width:100%;max-height:100%;object-fit:contain}
+.ptitle{font-size:17px;line-height:1.35;margin:14px 2px 6px}
+.bigprice .w{font-size:34px}
+.cmp{display:flex;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.cmp:first-child{border-top:0}
+.cmp img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:8px;flex:none}
+.cmp .t{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cmp .pp{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.ck{width:22px;height:22px;flex:none;accent-color:var(--brand);margin:0;padding:0}
+
+/* ---------- watchlist (from v1) ---------- */
+.item{display:flex;gap:12px;padding:12px;margin-bottom:10px;align-items:center;width:100%;text-align:left}
+.thumb{width:64px;height:64px;border-radius:10px;background:#fff;object-fit:contain;flex:none;border:1px solid var(--line)}
+.thumb.ph{display:grid;place-items:center;color:var(--brand);background:var(--brand-soft);border:0}
+.name{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pr{font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
 .big{font-size:32px;font-weight:800;letter-spacing:-.02em;margin-top:8px;font-variant-numeric:tabular-nums}
 .delta{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .down{color:var(--down)}.up{color:var(--up)}
-.chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand);font-weight:600;white-space:nowrap}
-.chip.warn{background:var(--warn-soft);color:var(--warn)}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.end{justify-content:flex-end}
-.fab{position:fixed;right:18px;bottom:22px;height:56px;padding:0 20px 0 16px;border-radius:18px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 6px 16px rgba(14,124,102,.3);z-index:6}
-.banner{display:flex;gap:10px;align-items:center;padding:12px;margin-bottom:12px;background:var(--warn-soft);border-radius:var(--r);font-size:14px}
-.banner svg.i{color:var(--warn)}
-.btn{height:44px;padding:0 16px;border-radius:12px;font-weight:600;background:var(--brand);color:var(--brand-ink);display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--line)}
-.btn.danger{background:transparent;color:var(--up);border:1px solid var(--line)}
-.btn.danger-fill{background:var(--up);color:#fff}
-.btn.sm{height:34px;padding:0 12px;font-size:13px;border-radius:10px}
-.wide{width:100%;margin-top:14px}
-.center{text-align:center}
-.empty{text-align:center;padding:36px 8px;color:var(--muted)}
-.empty .badge{width:72px;height:72px;border-radius:22px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;margin:0 auto}
-.empty .badge svg.i{width:36px;height:36px}
-.empty h2{color:var(--ink);font-size:20px;margin:16px 0 6px}
-.steps{text-align:left;margin:22px auto;max-width:360px;padding:0;list-style:none;counter-reset:s;color:var(--ink)}
-.steps li{counter-increment:s;display:flex;gap:12px;margin:12px 0}
-.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:13px}
 .hero-img{width:100%;height:190px;object-fit:contain;background:#fff;border-radius:var(--r) var(--r) 0 0;display:block;padding:10px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .stats b{display:block;font-variant-numeric:tabular-nums}
-.section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:22px 4px 8px}
 .listing{padding:12px 14px;display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line)}
 .listing:first-child{border-top:0}
 .right{text-align:right;flex:none}
 .err{color:var(--warn);font-size:13px;margin-top:4px}
-input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--brand)}
-textarea{resize:none}
-.row input{flex:1;width:auto;min-width:0}
-label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:600}
+.empty{text-align:center;padding:30px 8px;color:var(--muted)}
+.empty .bdg{width:68px;height:68px;border-radius:20px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;margin:0 auto}
+.empty .bdg svg.i{width:34px;height:34px}
+.empty h2{color:var(--ink);font-size:20px;margin:14px 0 6px}
+.banner{display:flex;gap:10px;align-items:center;padding:12px;margin-bottom:12px;background:var(--warn-soft);border-radius:var(--r);font-size:14px}
+.banner svg.i{color:var(--warn)}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg button{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:14px}
-.seg button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:600}
+.seg button.on{background:var(--ink);color:var(--card);border-color:var(--ink);font-weight:600}
 .set-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-top:1px solid var(--line)}
 .set-row:first-child{border-top:0}
 .set-block{padding:13px 14px;border-top:1px solid var(--line)}
@@ -89,38 +180,46 @@ label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-wei
 .tog:checked::after{left:21px}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20;align-items:flex-end}
 .sheet-bg.open{display:flex}
-.sheet{width:100%;max-height:92vh;overflow:auto;background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px 22px;animation:up .18s ease-out}
+.sheet{width:100%;max-height:90vh;overflow:auto;background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px 22px;animation:up .18s ease-out}
 .sheet h3{margin:0 0 6px;font-size:19px}
 .sheet .row.end{margin-top:18px}
 @keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
-.toast{position:fixed;left:16px;right:16px;bottom:92px;background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:12px;z-index:30;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;font-size:14px}
-.toast.show{opacity:1;transform:none}
-.spin{animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 .chart{display:block;width:100%;height:auto}
 .chart text{fill:var(--muted);font-size:10px;font-family:inherit}
 .legend{display:flex;flex-wrap:wrap;gap:12px;padding:0 14px 12px;font-size:12px;color:var(--muted)}
 .legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
-.about p{margin:0 0 10px}
-.about p:last-child{margin:0}
+.about p{margin:0 0 10px}.about p:last-child{margin:0}
 </style>
 </head>
 <body>
 <div id="view"></div>
-<button id="fab" class="fab" data-act="add" aria-label="Add a product link"></button>
+<nav class="tabs" id="tabs"></nav>
 <div id="sheet" class="sheet-bg"><div class="sheet" id="sheetBody"></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 'use strict';
 const A = window.Android || previewBridge();
+const STORES = [
+  {key: 'amazon', name: 'Amazon'}, {key: 'walmart', name: 'Walmart'}, {key: 'bestbuy', name: 'Best Buy'},
+  {key: 'target', name: 'Target'}, {key: 'ebay', name: 'eBay'}, {key: 'newegg', name: 'Newegg'}
+];
+const SORTS = [
+  ['featured', 'Featured'], ['low', 'Price: Low to High'], ['high', 'Price: High to Low'],
+  ['rating', 'Avg. Customer Review'], ['reviews', 'Most Reviews'], ['discount', 'Biggest Discount']
+];
 let S = {items: [], settings: {}};
-let view = {name: 'home'};
-let dirty = false, sheetOpen = false, busy = false, pendingAsk = null;
+let tab = 'search';
+let view = {name: 'home'};          // watchlist sub-view
+let product = null;                  // open search product
+const search = {q: '', token: '', res: {}, sort: 'featured', f: {min: '', max: '', rating: 0, hideSponsored: false, newOnly: false, stores: null}};
+let dirty = false, sheetOpen = false, busy = false, pendingAsk = null, picked = new Set();
 const $ = s => document.querySelector(s);
 
 // ---------- helpers ----------
 const ICONS = {
+  search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  x: '<path d="M18 6L6 18M6 6l12 12"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   refresh: '<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
   gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
@@ -128,18 +227,36 @@ const ICONS = {
   ext: '<path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>',
   trash: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>',
   bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  bellOn: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M9.5 10.5l2 2 3.5-3.5"/>',
   tag: '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.5"/>',
-  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  filter: '<path d="M4 6h16M7 12h10M10 18h4"/>',
+  list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
+  check: '<path d="M20 6L9 17l-5-5"/>',
+  alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  img: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'
 };
 const ic = (n, cls) => `<svg class="i ${cls || ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const safeImg = u => (typeof u === 'string' && /^https:\/\//i.test(u)) ? u : '';
+const storeKey = name => (STORES.find(s => s.name === name) || {}).key || 'other';
 function money(v, cur, noCents) {
   if (v == null || isNaN(v)) return '—';
   try {
     return new Intl.NumberFormat('en-US', {style: 'currency', currency: cur || 'USD',
       maximumFractionDigits: noCents ? 0 : 2, minimumFractionDigits: noCents ? 0 : 2}).format(v);
   } catch (e) { return '$' + Number(v).toFixed(noCents ? 0 : 2); }
+}
+function priceHtml(v, cls) {
+  if (v == null) return '';
+  const [w, c] = Number(v).toFixed(2).split('.');
+  return `<span class="price ${cls || ''}"><sup>$</sup><span class="w">${Number(w).toLocaleString('en-US')}</span><sup>${c}</sup></span>`;
+}
+function starsHtml(r, n) {
+  if (!r) return '';
+  const pct = Math.max(0, Math.min(100, r / 5 * 100));
+  return `<div class="stars"><span class="st" aria-label="${r} out of 5 stars">★★★★★<i style="width:${pct}%">★★★★★</i></span>${n ? `<span>${Number(n).toLocaleString('en-US')}</span>` : `<span>${r}</span>`}</div>`;
 }
 function ago(ts) {
   if (!ts) return 'never';
@@ -149,6 +266,247 @@ function ago(ts) {
   if (s < 86400) return Math.floor(s / 3600) + 'h ago';
   return Math.floor(s / 86400) + 'd ago';
 }
+let toastTimer;
+function toast(t) {
+  const e = $('#toast'); e.textContent = t; e.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove('show'), 3400);
+}
+function lsGet(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function load() {
+  try { S = JSON.parse(A.getState()); } catch (e) {}
+  if (!S.items) S.items = [];
+  if (!S.settings) S.settings = {};
+  if (!Array.isArray(S.settings.stores)) S.settings.stores = STORES.map(s => s.key);
+  document.documentElement.dataset.theme = S.dark ? 'dark' : 'light';
+}
+// Which tracked listing (if any) has this URL?
+function trackedUrls() {
+  const m = {};
+  S.items.forEach(it => (it.listings || []).forEach(l => { m[l.url] = it.id; }));
+  return m;
+}
+function canon(u) {
+  const a = String(u || '').match(/amazon\.[^/]+\/(?:.*\/)?(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+  return a ? `https://www.amazon.com/dp/${a[1]}` : u;
+}
+
+// ---------- matching (find the same product at other stores) ----------
+const STOP = new Set('the a an and or for with of in to by from on at new edition version pack inch in. black white silver gray grey blue red pink green gold renewed refurbished restored premium'.split(' '));
+function toks(t) {
+  return String(t || '').toLowerCase().replace(/[^a-z0-9.+ ]/g, ' ').split(/\s+/)
+    .map(w => w.replace(/^\.+|\.+$/g, '')).filter(w => (w.length > 1 || /\d/.test(w)) && !STOP.has(w));
+}
+// How well the shorter title is covered by the longer one; model numbers count triple,
+// and clashing model numbers (Pro 3 vs Pro 2) sink the score.
+function similarity(a, b) {
+  const A_ = new Set(toks(a)), B_ = new Set(toks(b));
+  if (!A_.size || !B_.size) return 0;
+  const wt = t => /\d/.test(t) ? 3 : 1;
+  let wa = 0, wb = 0, shared = 0;
+  A_.forEach(t => { wa += wt(t); if (B_.has(t)) shared += wt(t); });
+  B_.forEach(t => { wb += wt(t); });
+  let s = shared / Math.min(wa, wb);
+  const numA = [...A_].filter(t => /\d/.test(t)), numB = [...B_].filter(t => /\d/.test(t));
+  if (numA.some(t => !B_.has(t)) && numB.some(t => !A_.has(t))) s *= 0.4;
+  // A shared model number (AF140, WH1000XM5, B09XS7JWHH) is the strongest sign of the same product.
+  const isModel = t => /[a-z]/.test(t) && /\d/.test(t) && t.length >= 4 && !/^\d+(gb|tb|mb|mm|cm|in|qt|oz|lb|lbs|ft|ml|hz|mah|pk|ct|pcs|pack|gen|th|nd|rd|st)$/.test(t);
+  if ([...A_].some(t => isModel(t) && B_.has(t))) s = Math.max(s, 0.9);
+  return s;
+}
+function relevance(title, q) {
+  const qt = toks(q); if (!qt.length) return 1;
+  const tt = String(title).toLowerCase();
+  return qt.filter(t => tt.includes(t)).length / qt.length;
+}
+
+// ---------- search ----------
+function allResults() {
+  const out = [];
+  Object.values(search.res).forEach(r => (r.items || []).forEach(it => out.push(it)));
+  return out;
+}
+function filtered() {
+  const f = search.f;
+  const min = parseFloat(f.min), max = parseFloat(f.max);
+  return allResults().filter(it => {
+    if (f.stores && !f.stores.includes(it.storeKey)) return false;
+    if (!isNaN(min) && it.price < min) return false;
+    if (!isNaN(max) && it.price > max) return false;
+    if (f.rating && !(it.rating >= f.rating)) return false;
+    if (f.hideSponsored && it.sponsored) return false;
+    if (f.newOnly && /used|pre-owned|refurb|renewed|restored|open box|parts/i.test((it.condition || '') + ' ' + it.title)) return false;
+    return true;
+  });
+}
+function sorted(list) {
+  const s = search.sort;
+  const disc = it => it.was && it.was > it.price ? (it.was - it.price) / it.was : 0;
+  if (s === 'low') return list.slice().sort((a, b) => a.price - b.price);
+  if (s === 'high') return list.slice().sort((a, b) => b.price - a.price);
+  if (s === 'rating') return list.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0) || (b.reviews || 0) - (a.reviews || 0));
+  if (s === 'reviews') return list.slice().sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
+  if (s === 'discount') return list.slice().sort((a, b) => disc(b) - disc(a));
+  // Featured: each store's own ranking, interleaved, with off-topic results pushed down.
+  const good = [], weak = [];
+  list.forEach(it => (relevance(it.title, search.q) >= 0.5 ? good : weak).push(it));
+  const inter = arr => {
+    const by = {}; arr.forEach(it => (by[it.storeKey] = by[it.storeKey] || []).push(it));
+    Object.values(by).forEach(a => a.sort((x, y) => x.rank - y.rank));
+    const keys = STORES.map(s => s.key).filter(k => by[k]), out = [];
+    for (let i = 0; out.length < arr.length; i++) keys.forEach(k => { if (by[k][i]) out.push(by[k][i]); });
+    return out;
+  };
+  return inter(good).concat(inter(weak));
+}
+function doSearch(q) {
+  q = (q || '').trim();
+  if (!q) return;
+  const stores = S.settings.stores.length ? S.settings.stores : STORES.map(s => s.key);
+  search.q = q;
+  search.token = String(Date.now());
+  search.res = {};
+  stores.forEach(k => { search.res[k] = {status: 'loading', items: []}; });
+  search.f.stores = null;
+  product = null;
+  const rec = lsGet('recent', []).filter(x => x.toLowerCase() !== q.toLowerCase());
+  rec.unshift(q); lsSet('recent', rec.slice(0, 8));
+  tab = 'search';
+  render(); window.scrollTo(0, 0);
+  const inp = $('#q'); if (inp) inp.blur();
+  A.search(q, search.token, stores.join(','));
+}
+
+// ---------- render ----------
+function render() {
+  const ae = document.activeElement;
+  const typing = ae && ae.id !== 'q' && (ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT' || (ae.tagName === 'INPUT' && ae.type !== 'checkbox'));
+  if (typing && $('#view').contains(ae)) { dirty = true; return; }
+  dirty = false;
+  let keepQ = null, focusQ = false;
+  if ($('#q')) { keepQ = $('#q').value; focusQ = document.activeElement === $('#q'); }
+  let h;
+  if (tab === 'search') h = product ? renderProduct() : renderSearch();
+  else if (tab === 'watch') h = view.name === 'item' ? renderItem() : renderWatch();
+  else h = renderSettings();
+  $('#view').innerHTML = h;
+  if ($('#q') && keepQ != null) { $('#q').value = keepQ; if (focusQ) $('#q').focus(); }
+  const sh = $('.shead'); if (sh) document.documentElement.style.setProperty('--shead-h', sh.offsetHeight + 'px');
+  renderTabs();
+}
+function renderTabs() {
+  const n = S.items.length;
+  const b = (k, icon, label, extra) => `<button class="${tab === k ? 'on' : ''}" data-act="tab" data-id="${k}">${ic(icon)}${label}${extra || ''}</button>`;
+  $('#tabs').innerHTML = b('search', 'search', 'Search') + b('watch', 'bell', 'Watchlist', n ? `<span class="cnt">${n}</span>` : '') + b('settings', 'gear', 'Settings');
+}
+
+function searchHeader() {
+  const chips = Object.keys(search.res).length ? STORES.filter(s => search.res[s.key]).map(s => {
+    const r = search.res[s.key];
+    const sel = search.f.stores ? search.f.stores.includes(s.key) : true;
+    const st = r.status === 'loading' ? ic('refresh', 'spin')
+      : r.status === 'ok' ? `<b>${r.items.length}</b>`
+      : r.status === 'blocked' ? ic('alert') : '<span class="dot"></span>';
+    return `<button class="schip ${sel ? '' : 'off'} ${search.f.stores && sel ? 'on' : ''}" data-act="storeChip" data-id="${s.key}">${esc(s.name)} ${st}</button>`;
+  }).join('') : '';
+  return `<div class="shead">
+    <div class="brandrow"><span class="logo">${ic('tag')}</span>PricePing<small>Compare every store</small></div>
+    <form class="sbar" id="sform" autocomplete="off">
+      <input id="q" type="search" enterkeyhint="search" placeholder="Search Amazon, Walmart, Best Buy…" value="${esc(search.q)}">
+      ${search.q ? `<button type="button" class="clear" data-act="clearQ" aria-label="Clear">${ic('x')}</button>` : ''}
+      <button type="submit" class="go" aria-label="Search">${ic('search')}</button>
+    </form>
+    <div class="storebar">${chips}</div></div>`;
+}
+
+function renderSearch() {
+  let h = searchHeader();
+  if (!Object.keys(search.res).length) {
+    const rec = lsGet('recent', []);
+    h += `<main><div class="empty" style="padding-top:22px"><div class="bdg">${ic('search')}</div>
+      <h2>Search every store at once</h2>
+      <div>Type anything. PricePing searches Amazon, Walmart, Best Buy, Target, eBay and Newegg, then lets you sort by price and track the best deal.</div></div>`;
+    if (rec.length) h += `<div class="section-title">Recent searches</div><div class="chips">${rec.map(r => `<button class="chip" data-act="searchFor" data-id="${esc(r)}">${ic('refresh')}${esc(r)}</button>`).join('')}</div>`;
+    h += `<div class="section-title">Try</div><div class="chips">${['AirPods Pro', 'Air fryer', '65 inch 4K TV', 'Nintendo Switch', 'LEGO', 'Stanley tumbler', 'SSD 2TB'].map(r => `<button class="chip" data-act="searchFor" data-id="${esc(r)}">${esc(r)}</button>`).join('')}</div></main>`;
+    return h;
+  }
+  const loading = Object.values(search.res).some(r => r.status === 'loading');
+  const list = sorted(filtered());
+  const nf = (search.f.min ? 1 : 0) + (search.f.max ? 1 : 0) + (search.f.rating ? 1 : 0) + (search.f.hideSponsored ? 1 : 0) + (search.f.newOnly ? 1 : 0);
+  h += `<div class="toolbar"><div class="count">${loading ? 'Searching… ' : ''}<b>${list.length}</b> results for “${esc(search.q)}”</div>
+    <div class="selwrap"><select id="sort" aria-label="Sort by">${SORTS.map(([v, l]) => `<option value="${v}" ${search.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <button class="fbtn" data-act="filters">${ic('filter')}Filter${nf ? `<span class="n">${nf}</span>` : ''}</button></div><div class="results">`;
+  const blocked = Object.entries(search.res).filter(([, r]) => r.status === 'blocked' || r.status === 'error').map(([k]) => STORES.find(s => s.key === k).name);
+  if (blocked.length && !loading) h += `<div class="note">${esc(blocked.join(', '))} didn't answer this time (stores sometimes block automated searches). Try again in a minute.</div>`;
+  const tracked = trackedUrls();
+  const cheapest = list.length ? Math.min(...list.map(i => i.price)) : null;
+  list.slice(0, 150).forEach((it, i) => { h += resultCard(it, tracked, cheapest, i); });
+  if (loading) h += '<div class="skel"></div><div class="skel"></div>';
+  if (!loading && !list.length) h += `<div class="empty"><h2>No results</h2><div>${nf ? 'Try clearing some filters.' : 'Try different words.'}</div></div>`;
+  return h + '</div>';
+}
+function resultCard(it, tracked, cheapest, idx) {
+  const img = safeImg(it.image);
+  const pct = it.was && it.was > it.price ? Math.round((it.was - it.price) / it.was * 100) : 0;
+  const on = !!tracked[canon(it.url)];
+  return `<div class="rcard" data-act="openProduct" data-id="${esc(it.storeKey)}" data-lid="${esc(it.url)}">
+    <div class="rimg ${img ? '' : 'ph'}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ic('img')}</div>
+    <div class="rbody"><div class="rtitle">${esc(it.title)}</div>
+      ${starsHtml(it.rating, it.reviews)}
+      <div class="priceline">${pct >= 3 ? `<span class="off">-${pct}%</span>` : ''}${priceHtml(it.price)}${it.priceRange ? '<span class="was">+ options</span>' : ''}</div>
+      ${pct >= 3 ? `<div class="was">List: <s>${money(it.was)}</s></div>` : ''}
+      <div class="meta"><span class="store s-${esc(it.storeKey)}">${esc(it.store)}</span>
+        ${it.price === cheapest && Object.keys(search.res).length > 1 ? '<span class="tag cheap">Lowest price</span>' : ''}
+        ${it.condition ? `<span class="tag">${esc(it.condition)}</span>` : ''}
+        ${it.sponsored ? '<span class="tag">Sponsored</span>' : ''}
+        ${it.inStock === false ? '<span class="tag">Out of stock</span>' : ''}</div></div>
+    <button class="trk ${on ? 'on' : ''}" data-act="quickTrack" data-id="${esc(it.storeKey)}" data-lid="${esc(it.url)}" aria-label="${on ? 'Tracking' : 'Track price'}">${ic(on ? 'bellOn' : 'bell')}</button></div>`;
+}
+function findResult(storeKeyV, url) {
+  const r = search.res[storeKeyV]; return r && (r.items || []).find(i => i.url === url);
+}
+function matchesFor(p) {
+  return allResults().filter(o => o !== p && o.storeKey !== p.storeKey)
+    .map(o => ({o, s: similarity(p.title, o.title)}))
+    .filter(x => x.s >= 0.6).sort((a, b) => a.o.price - b.o.price)
+    .reduce((acc, x) => { if (!acc.some(y => y.o.storeKey === x.o.storeKey && y.s >= x.s)) acc.push(x); return acc; }, [])
+    .slice(0, 10);
+}
+function renderProduct() {
+  const p = product;
+  const img = safeImg(p.image);
+  const pct = p.was && p.was > p.price ? Math.round((p.was - p.price) / p.was * 100) : 0;
+  const tracked = trackedUrls();
+  const tid = tracked[canon(p.url)];
+  const m = matchesFor(p);
+  let h = `<header class="bar"><button class="icon-btn" data-act="closeProduct" aria-label="Back">${ic('back')}</button><h1 class="sm clamp1">${esc(search.q || 'Product')}</h1></header><main>
+    <div class="pimg">${img ? `<img src="${esc(img)}" alt="" referrerpolicy="no-referrer">` : ic('img')}</div>
+    <div class="ptitle">${esc(p.title)}</div>
+    <div class="row" style="margin:0 2px 8px"><span class="store s-${esc(p.storeKey)}">${esc(p.store)}</span>${starsHtml(p.rating, p.reviews)}${p.condition ? `<span class="tag">${esc(p.condition)}</span>` : ''}</div>
+    <div class="priceline" style="margin:0 2px">${pct >= 3 ? `<span class="off">-${pct}%</span>` : ''}${priceHtml(p.price, 'bigprice')}</div>
+    ${pct >= 3 ? `<div class="was" style="margin:2px 2px 0">List price: <s>${money(p.was)}</s> · you save ${money(p.was - p.price)}</div>` : ''}
+    ${tid ? `<button class="btn brand wide" data-act="gotoItem" data-id="${esc(tid)}">${ic('bellOn')}Tracking: view in Watchlist</button>`
+          : `<button class="btn wide" data-act="trackOne">${ic('bell')}Track price</button>`}
+    <button class="btn ghost wide" data-act="openUrl" data-id="${esc(p.url)}">${ic('ext')}View at ${esc(p.store)}</button>`;
+  h += `<div class="section-title">Compare at other stores</div>`;
+  if (m.length) {
+    h += `<div class="card">${m.map(({o}) => {
+      const k = o.storeKey + '|' + o.url;
+      return `<div class="cmp"><input type="checkbox" class="ck" data-pick="${esc(k)}" ${picked.has(k) ? 'checked' : ''} aria-label="Include ${esc(o.store)}">
+        ${safeImg(o.image) ? `<img src="${esc(o.image)}" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">` : ''}
+        <button class="grow" style="text-align:left" data-act="openProduct" data-id="${esc(o.storeKey)}" data-lid="${esc(o.url)}"><div class="t">${esc(o.title)}</div>
+        <span class="store s-${esc(o.storeKey)}" style="display:inline-block;margin-top:4px">${esc(o.store)}</span></button>
+        <div class="pp">${money(o.price)}${o.price < p.price ? `<div class="delta down">${money(p.price - o.price)} less</div>` : o.price > p.price ? `<div class="delta up">${money(o.price - p.price)} more</div>` : ''}</div></div>`;
+    }).join('')}</div>
+    <button class="btn brand wide" data-act="trackAll">${ic('bell')}Track here + ${picked.size || 'selected'} other store${picked.size === 1 ? '' : 's'}</button>
+    <p class="sub center" style="margin:8px 6px 0">Tick the stores selling the same thing. PricePing watches them all and pings you at the lowest price.</p>`;
+  } else {
+    h += `<div class="card pad sub">No close matches from other stores in these results. Try a more specific search, like the model number.</div>`;
+  }
+  return h + '</main>';
+}
+
+// ---------- watchlist ----------
 const findItem = id => (S.items || []).find(i => i.id === id);
 const priced = it => (it.listings || []).filter(l => l.price != null);
 function best(it) { const p = priced(it); return p.length ? p.reduce((a, b) => b.price < a.price ? b : a) : null; }
@@ -176,52 +534,20 @@ function freqLabel(h) {
   if (h === 24) return 'checks daily';
   return `checks every ${h}h`;
 }
-let toastTimer;
-function toast(t) {
-  const e = $('#toast'); e.textContent = t; e.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove('show'), 3600);
-}
-function load() {
-  try { S = JSON.parse(A.getState()); } catch (e) {}
-  if (!S.items) S.items = [];
-  if (!S.settings) S.settings = {};
-  document.documentElement.dataset.theme = S.dark ? 'dark' : 'light';
-}
-
-// ---------- screens ----------
-function render() {
-  const ae = document.activeElement;
-  const typing = ae && (ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT' || (ae.tagName === 'INPUT' && ae.type !== 'checkbox'));
-  if (typing && $('#view').contains(ae)) { dirty = true; return; }
-  dirty = false;
-  $('#view').innerHTML = view.name === 'item' ? renderItem() : view.name === 'settings' ? renderSettings() : renderHome();
-  const fab = $('#fab');
-  fab.style.display = view.name === 'settings' ? 'none' : 'flex';
-  fab.innerHTML = `${ic('plus')}${view.name === 'item' ? 'Add store' : 'Add link'}`;
-  fab.dataset.act = view.name === 'item' ? 'addHere' : 'add';
-  fab.dataset.id = view.name === 'item' ? view.id : '';
-}
-document.addEventListener('focusout', () => setTimeout(() => { if (dirty) render(); }, 0));
-
-function renderHome() {
+function renderWatch() {
   const items = S.items, st = S.settings;
-  let h = `<header><h1>PricePing</h1>
-    <button class="icon-btn" data-act="checkAll" aria-label="Check all prices now">${ic('refresh', S.checking ? 'spin' : '')}</button>
-    <button class="icon-btn" data-act="settings" aria-label="Settings">${ic('gear')}</button></header><main>`;
+  let h = `<header class="bar"><h1>Watchlist</h1>
+    <button class="icon-btn" data-act="addLink" aria-label="Add a product link">${ic('link')}</button>
+    <button class="icon-btn" data-act="checkAll" aria-label="Check all prices now">${ic('refresh', S.checking ? 'spin' : '')}</button></header><main>`;
   if (!S.notifOk && items.length) {
     h += `<div class="banner">${ic('bell')}<div class="grow">Alerts are off. Turn them on to get pinged when prices drop.</div>
       <button class="btn sm" data-act="notif">Turn on</button></div>`;
   }
   if (!items.length) {
-    h += `<div class="empty"><div class="badge">${ic('tag')}</div>
-      <h2>Track any product's price</h2>
-      <div>PricePing checks prices for you and pings you when they drop.</div>
-      <ol class="steps">
-        <li><span>Open a product in Amazon, Best Buy, Walmart, Target, or any store's app or website.</span></li>
-        <li><span>Tap <b>Share</b> and pick <b>PricePing</b>, or copy the link and tap <b>Add link</b>.</span></li>
-        <li><span>Add the same product from other stores and PricePing shows which is cheapest.</span></li>
-      </ol>
-      <button class="btn" data-act="add">${ic('plus')}Add your first link</button></div>`;
+    h += `<div class="empty"><div class="bdg">${ic('bell')}</div><h2>Nothing tracked yet</h2>
+      <div>Search for something, then tap the bell on any result. PricePing checks the price for you and pings you when it drops.</div>
+      <button class="btn wide" style="max-width:280px" data-act="tab" data-id="search">${ic('search')}Start searching</button>
+      <div style="margin-top:12px"><button class="btn ghost sm" data-act="addLink">${ic('link')}Or paste a product link</button></div></div>`;
     return h + '</main>';
   }
   h += `<p class="sub" style="margin:0 4px 10px">${items.length} item${items.length > 1 ? 's' : ''} · ${freqLabel(st.intervalHours)} · last check ${ago(st.lastRun)}</p>`;
@@ -230,74 +556,63 @@ function renderHome() {
     let body;
     if (b) {
       const hit = it.target != null && b.price <= it.target;
-      body = `<div class="row" style="gap:8px;margin-top:2px"><span class="price">${money(b.price, b.currency)}</span>${changeChip(b.price, prevPrice(b))}${hit ? '<span class="chip">Target hit</span>' : ''}</div>
+      body = `<div class="row" style="gap:8px;margin-top:2px"><span class="pr">${money(b.price, b.currency)}</span>${changeChip(b.price, prevPrice(b))}${hit ? '<span class="badge">Target hit</span>' : ''}</div>
         <div class="sub clamp1">at ${esc(b.store)}${n > 1 ? ` · ${n} stores` : ''}${it.target != null && !hit ? ` · target ${money(it.target)}` : ''}</div>`;
     } else {
       body = `<div class="sub" style="margin-top:4px">${n ? 'No price yet' : 'No store links'}</div>`;
-      if ((it.listings || []).some(l => l.error)) body += `<span class="chip warn">Needs attention</span>`;
+      if ((it.listings || []).some(l => l.error)) body += `<span class="badge warn">Needs attention</span>`;
     }
     h += `<button class="card item" data-act="item" data-id="${esc(it.id)}">${thumb(itemImage(it))}
       <div class="grow"><div class="name">${esc(it.name)}</div>${body}</div></button>`;
   });
   return h + '</main>';
 }
-
 function renderItem() {
   const it = findItem(view.id);
-  if (!it) { view = {name: 'home'}; return renderHome(); }
+  if (!it) { view = {name: 'home'}; return renderWatch(); }
   const id = esc(it.id), b = best(it), ls = (it.listings || []).slice()
     .sort((a, c) => (a.price == null ? Infinity : a.price) - (c.price == null ? Infinity : c.price));
   const lows = ls.map(l => l.lowest != null ? l.lowest : (l.price != null ? l.price : Infinity));
   const low = lows.length ? Math.min(...lows) : Infinity;
   const lastChecked = Math.max(0, ...ls.map(l => l.lastChecked || 0));
-  const img = itemImage(it), np = priced(it).length;
-  const st = S.settings;
-
-  let h = `<header><button class="icon-btn" data-act="home" aria-label="Back">${ic('back')}</button><h1 class="sm">Item</h1>
+  const img = itemImage(it), np = priced(it).length, st = S.settings;
+  let h = `<header class="bar"><button class="icon-btn" data-act="watchHome" aria-label="Back">${ic('back')}</button><h1 class="sm">Tracked item</h1>
     <button class="icon-btn" data-act="checkItem" data-id="${id}" aria-label="Check this item now">${ic('refresh', S.checking ? 'spin' : '')}</button></header><main>`;
   h += `<div class="card">${img ? `<img class="hero-img" src="${esc(img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
     <div class="pad"><div class="row" style="align-items:flex-start;flex-wrap:nowrap"><div class="name grow" style="-webkit-line-clamp:3">${esc(it.name)}</div>
     <button class="icon-btn" style="margin:-8px -8px 0 0" data-act="rename" data-id="${id}" aria-label="Rename">${ic('edit')}</button></div>
-    ${b ? `<div class="big">${money(b.price, b.currency)}</div>
-           <div class="sub">Best price at ${esc(b.store)}${np > 1 ? ` · cheapest of ${np} stores` : ''}</div>`
-        : `<div class="sub" style="margin-top:8px">No price yet. Tap the refresh button to try again.</div>`}
+    ${b ? `<div class="big">${money(b.price, b.currency)}</div><div class="sub">Best price at ${esc(b.store)}${np > 1 ? ` · cheapest of ${np} stores` : ''}</div>`
+        : `<div class="sub" style="margin-top:8px">No price yet. Tap refresh to try again.</div>`}
     <div class="stats"><div><span class="sub">Lowest seen</span><b>${isFinite(low) ? money(low) : '—'}</b></div>
-      <div><span class="sub">Stores</span><b>${ls.length}</b></div>
-      <div><span class="sub">Checked</span><b>${ago(lastChecked)}</b></div></div></div></div>`;
-
+      <div><span class="sub">Stores</span><b>${ls.length}</b></div><div><span class="sub">Checked</span><b>${ago(lastChecked)}</b></div></div></div></div>`;
   h += `<div class="section-title">Price alert</div><div class="card pad">
     <label for="target" style="margin-top:0">Ping me when the price is at or below</label>
     <div class="row" style="flex-wrap:nowrap"><input id="target" type="number" inputmode="decimal" step="0.01" min="0" placeholder="e.g. 199.99" value="${it.target != null ? esc(it.target) : ''}">
     <button class="btn" data-act="setTarget" data-id="${id}">Set</button>
     ${it.target != null ? `<button class="btn ghost" data-act="clearTarget" data-id="${id}">Clear</button>` : ''}</div>
-    <p class="sub" style="margin:10px 0 0">${st.notifyMode === 'target'
-      ? 'You only get alerts when a price reaches this target.'
+    <p class="sub" style="margin:10px 0 0">${st.notifyMode === 'target' ? 'You only get alerts when a price reaches this target.'
       : `You also get alerts for any drop${Number(st.minDropPct) ? ` of ${Number(st.minDropPct)}% or more` : ''}. Change this in Settings.`}</p></div>`;
-
   const ch = chart(it);
   if (ch) h += `<div class="section-title">Price history</div><div class="card">${ch}</div>`;
-
   h += `<div class="section-title">Stores</div><div class="card">`;
   if (!ls.length) h += `<div class="pad sub">No store links yet.</div>`;
   ls.forEach(l => {
     const isBest = b && l.id === b.id && np > 1;
     h += `<div class="listing"><div class="grow">
-      <div class="row" style="gap:6px"><b>${esc(l.store)}</b>${isBest ? '<span class="chip">Best</span>' : ''}${l.inStock === false ? '<span class="chip warn">Out of stock</span>' : ''}</div>
+      <div class="row" style="gap:6px"><b>${esc(l.store)}</b>${isBest ? '<span class="badge">Best</span>' : ''}${l.inStock === false ? '<span class="badge warn">Out of stock</span>' : ''}</div>
       <div class="sub clamp1">${l.title && l.title !== it.name ? esc(l.title) + ' · ' : ''}checked ${ago(l.lastChecked)}</div>
       ${l.error ? `<div class="err">${esc(l.error)}</div>` : ''}
       <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="openLink" data-id="${id}" data-lid="${esc(l.id)}">${ic('ext')}Open</button>
       <button class="btn sm ghost" data-act="rmListing" data-id="${id}" data-lid="${esc(l.id)}">${ic('trash')}Remove</button></div></div>
-      <div class="right"><div class="price">${money(l.price, l.currency)}</div>${changeChip(l.price, l.price != null ? prevPrice(l) : null)}</div></div>`;
+      <div class="right"><div class="pr">${money(l.price, l.currency)}</div>${changeChip(l.price, l.price != null ? prevPrice(l) : null)}</div></div>`;
   });
-  h += `</div>
-    <button class="btn ghost wide" data-act="addHere" data-id="${id}">${ic('plus')}Add this product from another store</button>
-    <p class="sub center" style="margin:10px 8px 0">Tip: open the same product in another store's app, tap <b>Share → PricePing</b>, and choose this item.</p>
-    <button class="btn danger wide" data-act="rmItem" data-id="${id}">${ic('trash')}Stop tracking this item</button>`;
+  h += `</div><button class="btn ghost wide" data-act="findMore" data-id="${id}">${ic('search')}Find this at more stores</button>
+    <button class="btn ghost wide" data-act="addHere" data-id="${id}">${ic('link')}Add a store link</button>
+    <button class="btn danger wide" data-act="rmItem" data-id="${id}">${ic('trash')}Stop tracking</button>`;
   return h + '</main>';
 }
-
 function chart(it) {
-  const COLORS = ['var(--brand)', '#6366F1', '#E11D48', '#D97706', '#0891B2', '#9333EA', '#65A30D'];
+  const COLORS = ['#0E7C66', '#6366F1', '#E11D48', '#D97706', '#0891B2', '#9333EA', '#65A30D'];
   const series = (it.listings || []).filter(l => (l.history || []).length).map((l, i) => ({
     name: l.store, color: COLORS[i % COLORS.length], pts: l.history.map(p => [Number(p[0]), Number(p[1])])
   }));
@@ -316,8 +631,7 @@ function chart(it) {
   let g = '';
   for (let k = 0; k <= 3; k++) {
     const v = p0 + (p1 - p0) * k / 3, yy = y(v);
-    g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>
-          <text x="${L - 6}" y="${Number(yy) + 3}" text-anchor="end">${money(v, 'USD', noCents)}</text>`;
+    g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1"/><text x="${L - 6}" y="${Number(yy) + 3}" text-anchor="end">${money(v, 'USD', noCents)}</text>`;
   }
   const d = t => new Date(t).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
   g += `<text x="${L}" y="${H - 6}">${d(t0)}</text><text x="${W - R}" y="${H - 6}" text-anchor="end">Now</text>`;
@@ -325,27 +639,28 @@ function chart(it) {
     let p = '';
     s.pts.forEach(([t, v], i) => { p += i === 0 ? `M${x(t)},${y(v)}` : `H${x(t)}V${y(v)}`; });
     const [lt, lv] = s.pts[s.pts.length - 1];
-    return `<path d="${p}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round"/>
-            <circle cx="${x(lt)}" cy="${y(lv)}" r="3.2" fill="${s.color}"/>`;
+    return `<path d="${p}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round"/><circle cx="${x(lt)}" cy="${y(lv)}" r="3.2" fill="${s.color}"/>`;
   }).join('');
-  const legend = series.length > 1
-    ? `<div class="legend">${series.map(s => `<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>` : '';
+  const legend = series.length > 1 ? `<div class="legend">${series.map(s => `<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>` : '';
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Price history">${g}${lines}</svg>${legend}`;
 }
 
+// ---------- settings ----------
 function renderSettings() {
   const st = S.settings;
   const seg = (k, opts) => `<div class="seg">${opts.map(([v, label]) =>
     `<button class="${String(st[k]) === String(v) ? 'on' : ''}" data-act="set" data-k="${k}" data-v="${v}">${label}</button>`).join('')}</div>`;
   const tog = (k, label, sub) => `<div class="set-row"><div class="grow"><div>${label}</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div>
     <input type="checkbox" class="tog" data-set="${k}" ${st[k] ? 'checked' : ''} aria-label="${esc(label)}"></div>`;
-  return `<header><button class="icon-btn" data-act="home" aria-label="Back">${ic('back')}</button><h1 class="sm">Settings</h1></header><main>
-    <div class="section-title">Automatic checks</div><div class="card">
-      <div class="set-block"><div style="margin-bottom:10px">Check prices</div>
+  return `<header class="bar"><h1>Settings</h1></header><main>
+    <div class="section-title">Stores to search</div><div class="card">
+      ${STORES.map(s => `<div class="set-row"><span class="store s-${s.key}">${esc(s.name)}</span><div class="grow"></div>
+        <input type="checkbox" class="tog" data-store="${s.key}" ${st.stores.includes(s.key) ? 'checked' : ''} aria-label="Search ${esc(s.name)}"></div>`).join('')}</div>
+    <div class="section-title">Automatic price checks</div><div class="card">
+      <div class="set-block"><div style="margin-bottom:10px">Check tracked prices</div>
       ${seg('intervalHours', [[0, 'Manual only'], [1, 'Every hour'], [3, 'Every 3h'], [6, 'Every 6h'], [12, 'Every 12h'], [24, 'Daily']])}
       <div class="sub" style="margin-top:10px">Last automatic check: ${ago(st.lastRun)}. Android may delay checks a little to save battery.</div></div>
       ${tog('wifiOnly', 'Only check on Wi‑Fi', 'Saves mobile data')}</div>
-
     <div class="section-title">Alerts</div><div class="card">
       <div class="set-block"><div style="margin-bottom:10px">Ping me for</div>
       ${seg('notifyMode', [['any', 'Any price drop'], ['target', 'Only my target prices']])}</div>
@@ -354,54 +669,102 @@ function renderSettings() {
       ${tog('notifyStock', 'Back-in-stock alerts', 'When an out-of-stock listing comes back')}
       <div class="set-row"><div class="grow"><div>Notifications</div><div class="sub">${S.notifOk ? 'On' : 'Off — you won\'t get pinged'}</div></div>
         ${S.notifOk ? '<button class="btn sm ghost" data-act="testNotif">Send test</button>' : '<button class="btn sm" data-act="notif">Turn on</button>'}</div></div>
-
     <div class="section-title">Backup</div><div class="card">
-      <div class="set-row"><div class="grow"><div>Save a backup</div><div class="sub">Share your list to Drive, email, or notes</div></div><button class="btn sm ghost" data-act="export">Export</button></div>
+      <div class="set-row"><div class="grow"><div>Save a backup</div><div class="sub">Share your watchlist to Drive, email, or notes</div></div><button class="btn sm ghost" data-act="export">Export</button></div>
       <div class="set-row"><div class="grow"><div>Restore a backup</div><div class="sub">Paste a backup you exported</div></div><button class="btn sm ghost" data-act="import">Import</button></div></div>
-
     <div class="section-title">How it works</div><div class="card pad sub about">
-      <p>PricePing runs entirely on your phone: no account, no server, nothing to pay for. It visits each product page you saved, reads the price the store publishes, and remembers it.</p>
-      <p>Stores sometimes block automated checks (Amazon most often). When that happens the listing shows a note and PricePing simply tries again on the next check.</p>
-      <p>Keep checks to a few hours apart; very frequent checks are more likely to be blocked.</p></div>
-  </main>`;
+      <p>PricePing runs entirely on your phone: no account, no server, nothing to pay for. Searches open each store's own search page in a hidden browser and read the results.</p>
+      <p>Stores sometimes block automated visits (Target and Amazon most often). When that happens PricePing tells you and tries again next time.</p>
+      <p>Open source · free forever.</p></div></main>`;
 }
 
 // ---------- sheets ----------
 function openSheet(html) { $('#sheetBody').innerHTML = html; $('#sheet').classList.add('open'); sheetOpen = true; }
 function closeSheet() { $('#sheet').classList.remove('open'); sheetOpen = false; busy = false; pendingAsk = null; if (dirty) render(); }
 $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet' && !busy) closeSheet(); });
-
 function openAdd(url, itemId) {
   const opts = S.items.slice().reverse().map(i => `<option value="${esc(i.id)}">${esc(i.name.length > 60 ? i.name.slice(0, 57) + '…' : i.name)}</option>`).join('');
   openSheet(`<h3>Add a product link</h3>
-    <div class="sub">Copy the link from any store (Amazon, Best Buy, Walmart, Target…), or use <b>Share → PricePing</b> in the store's app.</div>
+    <div class="sub">Paste a link from any store, or use <b>Share → PricePing</b> in a store's app.</div>
     <label for="url">Product link</label>
     <textarea id="url" rows="3" placeholder="https://www.bestbuy.com/site/…" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
-    <label for="to">Add to</label>
-    <select id="to"><option value="">New item</option>${opts}</select>
-    <div class="sub" style="margin-top:8px">Same product from another store? Pick it above and PricePing will compare the stores.</div>
+    <label for="to">Add to</label><select id="to"><option value="">New item</option>${opts}</select>
     <div class="row end"><button class="btn ghost" data-act="sheetClose">Cancel</button><button class="btn" data-act="sheetAdd">Add &amp; check price</button></div>`);
   $('#url').value = url || '';
   $('#to').value = (itemId && findItem(itemId)) ? itemId : '';
-  if (!url) setTimeout(() => $('#url').focus(), 80);
 }
 function ask(title, text, okLabel, fn) {
   pendingAsk = fn;
   openSheet(`<h3>${esc(title)}</h3><div class="sub">${esc(text)}</div>
     <div class="row end"><button class="btn ghost" data-act="sheetClose">Cancel</button><button class="btn danger-fill" data-act="askOk">${esc(okLabel)}</button></div>`);
 }
+function openFilters() {
+  const f = search.f;
+  openSheet(`<h3>Filter results</h3>
+    <label>Price</label><div class="row" style="flex-wrap:nowrap"><input id="fmin" type="number" inputmode="decimal" placeholder="Min $" value="${esc(f.min)}"><span class="sub">to</span><input id="fmax" type="number" inputmode="decimal" placeholder="Max $" value="${esc(f.max)}"></div>
+    <label>Customer rating</label><div class="seg" id="frate">${[[0, 'Any'], [3, '3★ & up'], [4, '4★ & up'], [4.5, '4.5★ & up']].map(([v, l]) => `<button class="${f.rating == v ? 'on' : ''}" data-act="fRate" data-id="${v}">${l}</button>`).join('')}</div>
+    <div class="set-row" style="padding:14px 0 6px;border:0"><div class="grow">New items only<div class="sub">Hide used, refurbished, open-box</div></div><input type="checkbox" class="tog" id="fnew" ${f.newOnly ? 'checked' : ''}></div>
+    <div class="set-row" style="padding:6px 0;border:0"><div class="grow">Hide sponsored</div><input type="checkbox" class="tog" id="fsp" ${f.hideSponsored ? 'checked' : ''}></div>
+    <div class="row end"><button class="btn ghost" data-act="fReset">Reset</button><button class="btn" data-act="fApply">Show results</button></div>`);
+}
+
+// ---------- tracking ----------
+function asListing(it) { return {url: it.url, store: it.store, price: it.price, title: it.title, image: it.image, inStock: it.inStock == null ? null : it.inStock}; }
+function track(main, others) {
+  if (busy) return;
+  busy = true;
+  A.trackProducts(JSON.stringify({name: main.title, listings: [asListing(main)].concat((others || []).map(asListing))}));
+}
 
 // ---------- actions ----------
 const ACT = {
-  item: id => { view = {name: 'item', id}; render(); window.scrollTo(0, 0); },
-  home: () => { view = {name: 'home'}; render(); window.scrollTo(0, 0); },
-  settings: () => { view = {name: 'settings'}; render(); window.scrollTo(0, 0); },
-  add: () => openAdd('', ''),
-  addHere: id => openAdd('', id),
-  checkAll: () => {
-    if (!S.items.length) return toast('Add a product link first.');
-    A.checkNow(''); toast('Checking prices… this takes a few seconds per store.');
+  tab: id => { tab = id; if (id === 'watch') view = {name: 'home'}; render(); window.scrollTo(0, 0); },
+  searchFor: q => { const i = $('#q'); if (i) i.value = q; doSearch(q); },
+  clearQ: () => { search.q = ''; search.res = {}; product = null; render(); setTimeout(() => $('#q') && $('#q').focus(), 50); },
+  storeChip: k => {
+    const cur = search.f.stores;
+    if (!cur) search.f.stores = [k];
+    else if (cur.length === 1 && cur[0] === k) search.f.stores = null;
+    else search.f.stores = cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k);
+    if (search.f.stores && !search.f.stores.length) search.f.stores = null;
+    render();
   },
+  filters: () => openFilters(),
+  fRate: v => { search.f.rating = Number(v); document.querySelectorAll('#frate button').forEach(b => b.classList.toggle('on', b.dataset.id === String(v))); },
+  fReset: () => { Object.assign(search.f, {min: '', max: '', rating: 0, hideSponsored: false, newOnly: false}); closeSheet(); render(); },
+  fApply: () => {
+    search.f.min = $('#fmin').value.trim(); search.f.max = $('#fmax').value.trim();
+    search.f.newOnly = $('#fnew').checked; search.f.hideSponsored = $('#fsp').checked;
+    closeSheet(); render(); window.scrollTo(0, 0);
+  },
+  openProduct: (k, url) => {
+    const it = findResult(k, url); if (!it) return;
+    product = it;
+    picked = new Set(matchesFor(it).filter(x => x.s >= 0.9).map(x => x.o.storeKey + '|' + x.o.url));
+    tab = 'search'; render(); window.scrollTo(0, 0);
+  },
+  closeProduct: () => { product = null; render(); },
+  quickTrack: (k, url) => {
+    const it = findResult(k, url); if (!it) return;
+    const tid = trackedUrls()[canon(it.url)];
+    if (tid) { tab = 'watch'; view = {name: 'item', id: tid}; render(); window.scrollTo(0, 0); return; }
+    track(it, []);
+  },
+  trackOne: () => track(product, []),
+  trackAll: () => {
+    const others = [...picked].map(k => { const [sk, ...u] = k.split('|'); return findResult(sk, u.join('|')); }).filter(Boolean);
+    if (!others.length) return toast('Tick at least one other store first.');
+    track(product, others);
+  },
+  gotoItem: id => { tab = 'watch'; view = {name: 'item', id}; product = null; render(); window.scrollTo(0, 0); },
+  openUrl: u => A.openUrl(u),
+  findMore: id => { const it = findItem(id); if (!it) return; tab = 'search'; doSearch(it.name.split(/[,(|]/)[0].slice(0, 80)); },
+  // watchlist
+  item: id => { view = {name: 'item', id}; render(); window.scrollTo(0, 0); },
+  watchHome: () => { view = {name: 'home'}; render(); window.scrollTo(0, 0); },
+  addLink: () => openAdd('', ''),
+  addHere: id => openAdd('', id),
+  checkAll: () => { if (!S.items.length) return toast('Track something first.'); A.checkNow(''); toast('Checking prices… this takes a few seconds per store.'); },
   checkItem: id => { A.checkNow(id); toast('Checking this item…'); },
   openLink: (id, lid) => { const it = findItem(id); const l = it && (it.listings || []).find(x => x.id === lid); if (l) A.openUrl(l.url); },
   rmListing: (id, lid) => {
@@ -413,7 +776,7 @@ const ACT = {
     const it = findItem(id); if (!it) return;
     openSheet(`<h3>Rename item</h3><label for="rn">Name</label><input id="rn" maxlength="160">
       <div class="row end"><button class="btn ghost" data-act="sheetClose">Cancel</button><button class="btn" data-act="renameOk" data-id="${esc(id)}">Save</button></div>`);
-    $('#rn').value = it.name; setTimeout(() => $('#rn').focus(), 80);
+    $('#rn').value = it.name;
   },
   renameOk: id => { const v = $('#rn').value.trim(); if (v) A.renameItem(id, v); closeSheet(); },
   setTarget: id => {
@@ -424,19 +787,12 @@ const ACT = {
   clearTarget: id => { A.setTarget(id, ''); toast('Target price cleared.'); },
   notif: () => A.requestNotifications(),
   testNotif: () => { A.testNotification(); toast('Test alert sent.'); },
-  set: (id, lid, b) => {
-    const k = b.dataset.k; let v = b.dataset.v;
-    if (k !== 'notifyMode') v = Number(v);
-    A.saveSettings(JSON.stringify({[k]: v}));
-  },
+  set: (id, lid, b) => { const k = b.dataset.k; let v = b.dataset.v; if (k !== 'notifyMode') v = Number(v); A.saveSettings(JSON.stringify({[k]: v})); },
   export: () => A.exportData(),
-  import: () => openSheet(`<h3>Restore a backup</h3><div class="sub">This replaces your current list.</div>
+  import: () => openSheet(`<h3>Restore a backup</h3><div class="sub">This replaces your current watchlist.</div>
       <label for="imp">Backup text</label><textarea id="imp" rows="6" placeholder='{"items":[…]}'></textarea>
       <div class="row end"><button class="btn ghost" data-act="sheetClose">Cancel</button><button class="btn" data-act="importOk">Restore</button></div>`),
-  importOk: () => {
-    const r = A.importData($('#imp').value);
-    if (r === 'ok') { closeSheet(); view = {name: 'home'}; load(); render(); toast('Backup restored.'); } else toast(r);
-  },
+  importOk: () => { const r = A.importData($('#imp').value); if (r === 'ok') { closeSheet(); load(); render(); toast('Backup restored.'); } else toast(r); },
   sheetClose: () => closeSheet(),
   askOk: () => { const f = pendingAsk; closeSheet(); if (f) f(); },
   sheetAdd: (id, lid, btn) => {
@@ -450,36 +806,58 @@ const ACT = {
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (!b || b.disabled) return;
+  if (b.dataset.act !== 'quickTrack' && e.target.closest('.trk')) return;
+  if (b.classList.contains('rcard') && e.target.closest('.trk')) return;
+  e.preventDefault();
   const f = ACT[b.dataset.act];
   if (f) f(b.dataset.id || '', b.dataset.lid || '', b);
 });
+document.addEventListener('submit', e => { if (e.target.id === 'sform') { e.preventDefault(); doSearch($('#q').value); } });
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.id === 'sort') { search.sort = t.value; t.blur(); render(); window.scrollTo(0, 0); return; }
+  if (t.dataset && t.dataset.pick) { t.checked ? picked.add(t.dataset.pick) : picked.delete(t.dataset.pick); render(); return; }
+  if (t.dataset && t.dataset.store) {
+    const on = new Set(S.settings.stores); t.checked ? on.add(t.dataset.store) : on.delete(t.dataset.store);
+    if (!on.size) { t.checked = true; return toast('Keep at least one store.'); }
+    A.setStores(STORES.map(s => s.key).filter(k => on.has(k)).join(','));
+    return;
+  }
   if (t.dataset && t.dataset.set) A.saveSettings(JSON.stringify({[t.dataset.set]: t.checked}));
 });
+document.addEventListener('focusout', () => setTimeout(() => { if (dirty) render(); }, 0));
 
 // ---------- messages from the app ----------
 function handlePending(p) {
   if (!p) return;
   if (p.toast) toast(p.toast);
-  if (p.openItem && findItem(p.openItem)) { if (sheetOpen) closeSheet(); view = {name: 'item', id: p.openItem}; render(); }
-  if (p.sharedUrl) openAdd(p.sharedUrl, view.name === 'item' ? view.id : '');
+  if (p.openItem && findItem(p.openItem)) { if (sheetOpen) closeSheet(); tab = 'watch'; view = {name: 'item', id: p.openItem}; render(); }
+  if (p.sharedUrl) { tab = 'watch'; render(); openAdd(p.sharedUrl, view.name === 'item' ? view.id : ''); }
 }
 window.onNative = function (raw) {
   let m; try { m = JSON.parse(raw); } catch (e) { return; }
-  if (m.type === 'state') { load(); render(); }
+  if (m.type === 'search') {
+    if (m.token !== search.token) return;
+    search.res[m.store] = {status: m.status, items: (m.items || []).filter(i => i.price != null)};
+    if (!product) render();
+  } else if (m.type === 'state') { load(); render(); }
   else if (m.type === 'pending') { load(); render(); handlePending(m); }
   else if (m.type === 'toast') toast(m.text);
   else if (m.type === 'checked') {
     load(); render();
-    toast(m.count < 0 ? 'Already checking — hang on.' : m.count > 0 ? `Done: ${m.count} price alert${m.count > 1 ? 's' : ''}!` : 'Prices checked.');
+    toast(m.count < 0 ? 'Already checking. Hang on.' : m.count > 0 ? `Done: ${m.count} price alert${m.count > 1 ? 's' : ''}!` : 'Prices checked.');
+  } else if (m.type === 'tracked') {
+    busy = false; load(); render();
+    if (m.ok) {
+      toast(m.added > 1 ? `Tracking ${m.added} stores. You'll be pinged when prices drop.` : `Tracking. You'll be pinged when the price drops.`);
+      let asked = false; try { asked = localStorage.getItem('askedNotif') === '1'; localStorage.setItem('askedNotif', '1'); } catch (e) {}
+      if (!S.notifOk && !asked) setTimeout(() => A.requestNotifications(), 900);
+    } else toast(m.error || 'Could not track that.');
   } else if (m.type === 'added') {
     busy = false;
     if (m.ok) {
-      closeSheet(); load(); view = {name: 'item', id: m.itemId}; render(); window.scrollTo(0, 0);
+      closeSheet(); load(); tab = 'watch'; view = {name: 'item', id: m.itemId}; render(); window.scrollTo(0, 0);
       toast(m.found ? `Added: ${money(m.price)} at ${m.store}` : `Added, but no price yet. ${m.error || ''}`);
-      let asked = false; try { asked = localStorage.getItem('askedNotif') === '1'; localStorage.setItem('askedNotif', '1'); } catch (e) {}
-      if (!S.notifOk && !asked) setTimeout(() => A.requestNotifications(), 900);
     } else {
       toast(m.error || 'Could not add that link.');
       const b = document.querySelector('[data-act=sheetAdd]');
@@ -489,7 +867,10 @@ window.onNative = function (raw) {
 };
 window.goBack = function () {
   if (sheetOpen) { if (!busy) closeSheet(); return true; }
-  if (view.name !== 'home') { ACT.home(); return true; }
+  if (tab === 'search' && product) { product = null; render(); return true; }
+  if (tab === 'watch' && view.name !== 'home') { ACT.watchHome(); return true; }
+  if (tab !== 'search') { ACT.tab('search'); return true; }
+  if (Object.keys(search.res).length) { ACT.clearQ(); $('#q') && $('#q').blur(); return true; }
   return false;
 };
 
@@ -497,14 +878,27 @@ window.goBack = function () {
 function previewBridge() {
   const day = 864e5, now = Date.now();
   const st = {dark: false, notifOk: false, checking: false,
-    settings: {intervalHours: 6, notifyMode: 'any', minDropPct: 1, wifiOnly: false, notifyStock: true, lastRun: now - 2 * 3600e3},
+    settings: {intervalHours: 6, notifyMode: 'any', minDropPct: 1, wifiOnly: false, notifyStock: true, lastRun: now - 2 * 3600e3, stores: ['amazon', 'walmart', 'bestbuy', 'target', 'ebay', 'newegg']},
     items: [{id: 'a1', name: 'Sony WH-1000XM5 Wireless Noise Canceling Headphones', target: 300, listings: [
       {id: 'l1', store: 'Amazon', url: 'https://www.amazon.com/dp/B09XS7JWHH', price: 328, lowest: 298, lastChecked: now - 3600e3, history: [[now - 20 * day, 399.99], [now - 9 * day, 348], [now - 2 * day, 328]]},
-      {id: 'l2', store: 'Best Buy', url: 'https://www.bestbuy.com/', price: 349.99, lowest: 329.99, lastChecked: now - 3600e3, history: [[now - 18 * day, 399.99], [now - 6 * day, 349.99]]},
-      {id: 'l3', store: 'Walmart', url: 'https://www.walmart.com/', price: null, error: 'The store blocked this check. PricePing will try again next time.', lastChecked: now - 3600e3, history: []}]}]};
-  const push = m => setTimeout(() => window.onNative(JSON.stringify(m)), 300);
+      {id: 'l2', store: 'Best Buy', url: 'https://www.bestbuy.com/x', price: 349.99, lowest: 329.99, lastChecked: now - 3600e3, history: [[now - 18 * day, 399.99], [now - 6 * day, 349.99]]}]}]};
+  const push = m => setTimeout(() => window.onNative(JSON.stringify(m)), 200);
+  const demo = {
+    amazon: [{title: 'Apple AirPods Pro 3 Wireless Earbuds with Active Noise Cancellation', price: 199, was: 249, rating: 4.4, reviews: 16749, url: 'https://www.amazon.com/dp/B0FQFB8FMG', sponsored: true},
+             {title: 'Apple AirPods 4 Wireless Earbuds', price: 129, rating: 4.3, reviews: 289, url: 'https://www.amazon.com/dp/B0HJB69GJL'}],
+    walmart: [{title: 'Apple AirPods Pro 3', price: 199, was: 249, rating: 4.4, reviews: 18769, url: 'https://www.walmart.com/ip/AirPods-Pro-3/17835006350', inStock: true}],
+    bestbuy: [{title: 'Apple - AirPods Pro 3, Wireless Active Noise Cancelling Earbuds with Heart Rate Sensing Feature - White', price: 249.99, rating: 4.8, reviews: 11658, url: 'https://www.bestbuy.com/product/apple-airpods-pro-3/JJGCQLYK5F'}],
+    ebay: [{title: 'Apple AirPods Pro 3 Sealed Brand New', price: 179.5, url: 'https://www.ebay.com/itm/1', condition: 'Brand New'},
+           {title: 'AirPods Pro 2nd Generation Charging Case Replacement', price: 39.99, url: 'https://www.ebay.com/itm/2', condition: 'Refurbished'}],
+    newegg: [], target: []
+  };
   return {
     ready: () => '{}', getState: () => JSON.stringify(st),
+    search: (q, token, stores) => stores.split(',').forEach((k, i) => setTimeout(() => window.onNative(JSON.stringify({type: 'search', token, store: k,
+      name: k, status: k === 'target' ? 'blocked' : demo[k] && demo[k].length ? 'ok' : 'empty',
+      items: (demo[k] || []).map((x, r) => Object.assign({store: {amazon: 'Amazon', walmart: 'Walmart', bestbuy: 'Best Buy', ebay: 'eBay'}[k], storeKey: k, rank: r}, x))})), 300 + i * 250)),
+    trackProducts: j => { const r = JSON.parse(j); st.items.push({id: 'n' + Date.now(), name: r.name, listings: r.listings.map((l, i) => Object.assign({id: 'x' + i, history: [[Date.now(), l.price]]}, l))}); push({type: 'tracked', ok: true, added: r.listings.length}); },
+    setStores: c => { st.settings.stores = c.split(','); },
     addLink: () => push({type: 'added', ok: false, error: 'Preview mode: install the app to add links.'}),
     checkNow: () => push({type: 'checked', count: 0}),
     removeItem: id => { st.items = st.items.filter(i => i.id !== id); push({type: 'state'}); },

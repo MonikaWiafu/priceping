@@ -1,6 +1,6 @@
 # PricePing
 
-A free, open-source Android price tracker. Share a product from any store (Amazon, Best Buy, Walmart, Target, eBay, Newegg, Costco and most others) and PricePing checks the price in the background and pings you when it drops. Add the same product from several stores and it shows which one is cheapest.
+A free, open-source Android price tracker. Type anything and PricePing searches Amazon, Walmart, Best Buy, Target, eBay and Newegg at once, in a shopping-style results list you can sort (price, rating, reviews, discount) and filter. Tap the bell on any result and it watches the price in the background and pings you when it drops. Track the same product at several stores and it tells you where it's cheapest.
 
 - **No server, no account, no upkeep.** Everything runs on the phone. Data is one small file on the device.
 - **Works with almost any store.** It reads the product data stores publish for Google Shopping (schema.org), plus store-specific fallbacks for Amazon, Walmart, Target, Best Buy, Newegg and eBay.
@@ -25,7 +25,7 @@ Add two repository secrets (Settings → Secrets and variables → Actions): `KE
 
 - Stores can block automated checks, Amazon most often. Blocked checks show a note and retry on the next run.
 - Android decides the exact moment background jobs run, so "every 6 hours" may drift a bit to save battery.
-- PricePing compares the links you add; it doesn't search other stores on its own.
+- Searches open each store's own search page in a hidden browser on your phone. Target blocks this often; Best Buy usually returns only its top few results with prices.
 
 ## Build it yourself
 

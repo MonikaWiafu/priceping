@@ -28,7 +28,20 @@ object Checker {
     fun extractUrl(text: String): String? =
         Regex("""https?://[^\s<>"']+""").find(text)?.value?.trimEnd('.', ',', ')', ']', '!', '?')
 
-    fun fetchListing(url: String): Outcome = try {
+    /** Tries a quick direct download first; if the store blocks it, retries in the hidden browser. */
+    fun fetchListing(ctx: Context, url: String): Outcome {
+        val first = fetchDirect(url)
+        if (first.price != null || first.error?.contains("404") == true) return first
+        val html = try {
+            WebScraper.loadHtmlBlocking(ctx, url, 25_000) { h -> PriceParser.parse(h, url).price != null }
+        } catch (e: Throwable) { null }
+        if (html.isNullOrEmpty()) return first
+        val r = PriceParser.parse(html, url)
+        if (r.price == null) return first
+        return Outcome(r.title ?: first.title, r.price, r.currency, r.image ?: first.image, r.inStock, null, url)
+    }
+
+    private fun fetchDirect(url: String): Outcome = try {
         val page = Fetcher.get(url)
         val r = PriceParser.parse(page.body, page.finalUrl)
         val err = when {
@@ -48,7 +61,7 @@ object Checker {
     fun addLink(ctx: Context, text: String, itemId: String?): JSONObject {
         val raw = extractUrl(text)
             ?: return JSONObject().put("ok", false).put("error", "That doesn't look like a link. Paste the full product link (starting with https://).")
-        val o = fetchListing(PriceParser.canonicalUrl(raw))
+        val o = fetchListing(ctx, PriceParser.canonicalUrl(raw))
         val url = PriceParser.canonicalUrl(o.finalUrl)
         val host = PriceParser.hostOf(url)
         val storeName = PriceParser.storeName(host)
@@ -89,6 +102,66 @@ object Checker {
                 .put("price", o.price ?: JSONObject.NULL)
                 .put("store", storeName)
                 .put("error", o.error ?: JSONObject.NULL)
+        }
+    }
+
+    /**
+     * Tracks products picked from search results. We already know their prices, so no download is
+     * needed. Input: { itemId?, name, listings: [ {url, store, price, title, image, inStock} ] }
+     */
+    fun trackProducts(ctx: Context, req: JSONObject): JSONObject {
+        val now = System.currentTimeMillis()
+        val incoming = req.optJSONArray("listings") ?: JSONArray()
+        return Store.edit(ctx) { data ->
+            val items = data.getJSONArray("items")
+            val wanted = req.optString("itemId")
+            var item: JSONObject? = if (wanted.isNotEmpty()) Store.findItem(data, wanted) else null
+            // Already tracking this exact link? Reuse that item instead of making a duplicate.
+            if (item == null) {
+                val firstUrl = incoming.optJSONObject(0)?.optString("url")
+                for (i in 0 until items.length()) {
+                    val it = items.optJSONObject(i) ?: continue
+                    val ls = it.optJSONArray("listings") ?: continue
+                    for (j in 0 until ls.length()) if (ls.optJSONObject(j)?.optString("url") == firstUrl) item = it
+                }
+            }
+            if (item == null) {
+                item = JSONObject()
+                    .put("id", Store.newId())
+                    .put("name", req.optString("name").take(160).ifEmpty { "Tracked item" })
+                    .put("created", now)
+                    .put("target", JSONObject.NULL)
+                    .put("listings", JSONArray())
+                items.put(item)
+            }
+            val listings = item.getJSONArray("listings")
+            var added = 0
+            for (i in 0 until incoming.length()) {
+                val inc = incoming.optJSONObject(i) ?: continue
+                val url = PriceParser.canonicalUrl(inc.optString("url"))
+                if (!url.startsWith("http")) continue
+                var exists = false
+                for (j in 0 until listings.length()) if (listings.optJSONObject(j)?.optString("url") == url) exists = true
+                if (exists) continue
+                val l = JSONObject()
+                    .put("id", Store.newId())
+                    .put("url", url)
+                    .put("store", inc.optString("store").ifEmpty { PriceParser.storeName(PriceParser.hostOf(url)) })
+                    .put("added", now)
+                    .put("history", JSONArray())
+                val o = Outcome(
+                    inc.optString("title").ifEmpty { null },
+                    if (inc.has("price") && !inc.isNull("price")) inc.optDouble("price").takeIf { !it.isNaN() } else null,
+                    "USD",
+                    inc.optString("image").takeIf { it.startsWith("https://") },
+                    if (inc.has("inStock") && !inc.isNull("inStock")) inc.optBoolean("inStock") else null,
+                    null, url,
+                )
+                applyOutcome(l, o, now)
+                listings.put(l)
+                added++
+            }
+            JSONObject().put("ok", true).put("itemId", item.getString("id")).put("added", added)
         }
     }
 
@@ -154,7 +227,7 @@ object Checker {
             for ((n, t) in targets.withIndex()) {
                 if (Thread.currentThread().isInterrupted) break
                 if (n > 0) Thread.sleep(1500L + Random.nextLong(2500L)) // be polite to stores
-                val o = fetchListing(t.url)
+                val o = fetchListing(ctx, t.url)
                 val alerts = ArrayList<Array<String>>()
                 Store.edit(ctx) { data ->
                     val item = Store.findItem(data, t.itemId) ?: return@edit

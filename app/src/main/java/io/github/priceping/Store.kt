@@ -58,6 +58,9 @@ object Store {
         if (!s.has("minDropPct")) s.put("minDropPct", 1)
         if (!s.has("wifiOnly")) s.put("wifiOnly", false)
         if (!s.has("notifyStock")) s.put("notifyStock", true)
+        if (s.optJSONArray("stores") == null) {
+            s.put("stores", JSONArray().put("amazon").put("walmart").put("bestbuy").put("target").put("ebay").put("newegg"))
+        }
         return d
     }
 

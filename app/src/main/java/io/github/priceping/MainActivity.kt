@@ -211,6 +211,39 @@ class MainActivity : Activity() {
             }
         }
 
+        /** Searches the chosen stores; each store's results arrive as a separate "search" message. */
+        @JavascriptInterface
+        fun search(query: String, token: String, storesCsv: String) {
+            val q = query.trim().take(200)
+            if (q.isEmpty()) return
+            val stores = storesCsv.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+            ui.post {
+                if (destroyed) return@post
+                SearchEngine.run(applicationContext, q, stores) { r ->
+                    push(r.put("type", "search").put("token", token))
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun trackProducts(json: String) {
+            exec.execute {
+                val r = try {
+                    Checker.trackProducts(applicationContext, JSONObject(json))
+                } catch (e: Exception) {
+                    JSONObject().put("ok", false).put("error", "Couldn't track that: ${e.message}")
+                }
+                push(r.put("type", "tracked"))
+            }
+        }
+
+        @JavascriptInterface
+        fun setStores(csv: String) {
+            val arr = org.json.JSONArray()
+            csv.split(',').map { it.trim() }.filter { k -> SearchEngine.STORES.any { it.key == k } }.distinct().forEach { arr.put(it) }
+            Store.edit(applicationContext) { it.getJSONObject("settings").put("stores", arr) }
+        }
+
         @JavascriptInterface
         fun checkNow(itemId: String) {
             exec.execute {
