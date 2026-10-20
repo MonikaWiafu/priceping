@@ -1,0 +1,84 @@
+name: Build APK
+
+# Runs on GitHub's free build machines every time you change the repo (or when you
+# press "Run workflow" on the Actions tab). The finished APK is published as a
+# Release, which gives a public download link anyone can use.
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Works whether you uploaded the project's files directly or just PricePing.zip.
+      - name: Find the project
+        run: |
+          if [ -f PricePing.zip ]; then
+            mkdir -p "$RUNNER_TEMP/src"
+            unzip -q PricePing.zip -d "$RUNNER_TEMP/src"
+            settings=$(find "$RUNNER_TEMP/src" -name settings.gradle.kts | head -1)
+            dir=$(dirname "$settings")
+          else
+            dir="$GITHUB_WORKSPACE"
+          fi
+          echo "PROJECT_DIR=$dir" >> "$GITHUB_ENV"
+          echo "Building from $dir"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      # Optional: add repository secrets KEYSTORE_BASE64 and KEYSTORE_PASSWORD so every
+      # build is signed with the same key and new versions install over old ones.
+      - name: Set up signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ]; then
+            printf '%s' "$KEYSTORE_BASE64" | tr -d ' \r\n' | base64 -d > "$RUNNER_TEMP/release.jks"
+            {
+              echo "SIGNING_KEYSTORE_PATH=$RUNNER_TEMP/release.jks"
+              echo "SIGNING_STORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "SIGNING_KEY_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "SIGNING_KEY_ALIAS=priceping"
+            } >> "$GITHUB_ENV"
+            echo "Signing with your key."
+          else
+            echo "::warning::No signing secrets set. The APK uses a temporary key, so updating later means uninstalling first (export a backup in Settings before you do)."
+          fi
+
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR"
+          gradle assembleRelease --no-daemon --stacktrace
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/PricePing.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PricePing-apk
+          path: ${{ runner.temp }}/PricePing.apk
+
+      - name: Publish download link
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: PricePing 1.0.${{ github.run_number }}
+          body: |
+            Download **PricePing.apk** below on your Android phone and open it to install.
+            (Android will ask you to allow installs from your browser the first time.)
+          files: ${{ runner.temp }}/PricePing.apk
+          make_latest: true
